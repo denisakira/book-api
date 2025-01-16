@@ -15,7 +15,8 @@ const dataSourceOptions: DataSourceOptions = {
   password: configService.get('DB_PASSWORD'),
   database: configService.get('DB_NAME'),
   entities: ['dist/**/*.entity{.ts,.js}'],
-  migrations: ['dist/migrations/*{.ts,.js}'],
+  migrations: ['dist/**/migrations/*{.ts,.js}'],
+  migrationsTableName: 'migrations',
   synchronize: false, // Set to false in production
   logging: true,
 };
@@ -25,7 +26,7 @@ const e2eDataSourceOptions: DataSourceOptions = {
   entities: [join(__dirname, '..', 'src', '**', '*.entity.{ts,js}')],
 };
 
-export const dataSourceOptionsCallback = () => {
+export const getDataSourceOptions = () => {
   if (process.env.NODE_ENV === 'test') {
     return e2eDataSourceOptions;
   }

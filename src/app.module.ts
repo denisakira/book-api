@@ -1,18 +1,16 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BookModule } from './book/book.module';
-import { dataSourceOptionsCallback } from './orm-config';
+import { getDataSourceOptions } from './orm-config';
 import { RedisCacheModule } from './cache/cache.module';
 
 @Module({
   imports: [
     BookModule,
-    TypeOrmModule.forRoot(dataSourceOptionsCallback()),
+    TypeOrmModule.forRoot(getDataSourceOptions()),
     RedisCacheModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

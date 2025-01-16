@@ -46,15 +46,11 @@ describe('BookService', () => {
 
   it('should call the cache and if nothing is found then call the repository', async () => {
     const getRepositorySpy = jest
-      .spyOn(repository, 'findOne')
+      .spyOn(repository, 'findOneBy')
       .mockImplementationOnce(() => Promise.resolve(mockBook));
     const cacheServiceSpy = jest.spyOn(cacheService, 'get');
 
-    console.debug(cacheServiceSpy);
-
-    const result = await service.getBook(1);
-
-    console.debug(result);
+    await service.getBook(1);
 
     expect(cacheServiceSpy).toHaveBeenCalledWith('book:1');
     expect(getRepositorySpy).toHaveBeenCalled();

@@ -13,7 +13,17 @@ export class OpenLibraryBookEnrichmentService implements BookEnrichmentService {
   async enrichBookData(book: IBook): Promise<IBook | null> {
     try {
       const response = await fetch(`${this.openLibraryApi}/${book.isbn}.json`);
-      const data = (await response.json()) as OpenLibraryResponse;
+      const data = (await response.json()) as
+        | OpenLibraryResponse
+        | { error: string };
+
+      if ('error' in data) {
+        return {
+          ...book,
+          extra: null,
+        };
+      }
+
       return {
         ...book,
         extra: data ? { ...data } : null,

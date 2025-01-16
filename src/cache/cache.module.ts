@@ -25,7 +25,6 @@ const cacheConfigFactory = async (configService: ConfigService) => {
       imports: [ConfigModule],
       useFactory: cacheConfigFactory,
       inject: [ConfigService],
-      isGlobal: true,
     }),
   ],
   providers: [CacheService],

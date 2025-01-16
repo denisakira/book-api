@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CacheService } from 'src/cache/cache.service';
 import { Repository } from 'typeorm';
@@ -38,34 +38,44 @@ export class BookService {
 
     // If not in cache, get from DB
     const book = await this.bookRepository.findOneBy({ id });
-    if (book) {
-      await this.cacheService.set(`book:${id}`, book, 3600);
+    if (!book) {
+      throw new NotFoundException('Book not found');
     }
+
+    // Save to cache
+    await this.cacheService.set(`book:${id}`, book, 3600);
 
     return book;
   }
 
-  async updateBook(
-    id: number,
-    book: Partial<IBook>,
-  ): Promise<IBook | undefined> {
-    await this.bookRepository.update(id, book);
-    const updatedBook = await this.bookRepository.findOneBy({ id });
+  async updateBook(id: number, bookData: Partial<IBook>): Promise<IBook> {
+    const book = await this.bookRepository.findOneBy({ id });
 
-    if (updatedBook) {
-      // Update cache with new data
-      await this.cacheService.set(`book:${id}`, updatedBook, 3600);
-    } else {
-      // If book no longer exists, remove from cache
-      await this.cacheService.del(`book:${id}`);
+    if (!book) {
+      throw new NotFoundException('Book not found');
     }
+
+    // Merge the updates with existing book
+    const updatedBook = await this.bookRepository.save({
+      ...book,
+      ...bookData,
+    });
+
+    // Update cache
+    await this.cacheService.set(`book:${id}`, updatedBook, 3600);
 
     return updatedBook;
   }
 
-  async deleteBook(id: number): Promise<void> {
-    await this.bookRepository.delete(id);
-    // Remove from cache
+  async deleteBook(id: number): Promise<boolean> {
+    const result = await this.bookRepository.delete(id);
+    // Remove from cache regardless of result
     await this.cacheService.del(`book:${id}`);
+
+    if (result.affected === 0) {
+      throw new NotFoundException('Book not found');
+    }
+
+    return true;
   }
 }
