@@ -16,6 +16,10 @@ export class BookService {
     private bookEnrichmentService: BookEnrichmentService,
   ) {}
 
+  async getBooks(): Promise<IBook[]> {
+    return this.bookRepository.find();
+  }
+
   async createBook(book: IBook): Promise<IBook> {
     // First enrich the book data
     const enrichedBook = await this.bookEnrichmentService.enrichBookData(book);

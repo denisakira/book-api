@@ -15,9 +15,13 @@ The book data from OpenLibrary is added to records in the moment of their creati
 
 ## Running the app
 
+Copy `.env.example` to `.env` and fill in the values. Then run:
+
 ```bash
 docker compose up
 ```
+
+The application will be available at `http://localhost:3000`.
 
 ## Running the tests
 

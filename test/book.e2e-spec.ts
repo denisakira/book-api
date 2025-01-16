@@ -249,16 +249,12 @@ describe('BookController (e2e)', () => {
         .send(payload)
         .expect(201);
 
-      console.debug('createResponse', createResponse.body);
-
       const bookId = createResponse.body.id;
 
       const updateResponse = await request(app.getHttpServer())
         .patch(`/book/${bookId}`)
         .send({ ...payload, title: 'Updated Title' })
         .expect(200);
-
-      console.debug('updateResponse', updateResponse.body);
 
       expect(updateResponse.body.extra).toEqual(sampleOpenLibraryResponse);
     });
