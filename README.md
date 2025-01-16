@@ -22,11 +22,11 @@ docker compose up
 ### Unit tests
 
 ```bash
-npm run test
+docker compose exec -it app npm run test
 ```
 
 ### E2E tests
 
 ```bash
-npm run test:e2e
+docker compose exec -it app npm run test:e2e
 ```

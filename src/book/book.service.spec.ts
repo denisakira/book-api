@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CacheService, MockCacheService } from '../cache/cache.service';
-import { mockBook, mockRepository } from '../shared/test.util';
+import { mockBook, mockRepository } from '../shared/test';
 import {
   BookEnrichmentService,
   MockBookEnrichmentService,
