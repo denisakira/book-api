@@ -2,7 +2,9 @@
 
 ## Description
 
-This is an API for managing books.
+This is an API for managing books. It has basic CRUD endpoints, and uses OpenLibrary to add extra information.
+
+The book data from OpenLibrary is added to records in the moment of their creation, or when an update involves the ISBN field.
 
 ## Technologies
 

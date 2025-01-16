@@ -66,6 +66,56 @@ export const sampleOpenLibraryResponse = {
   },
 };
 
+const sampleIsbn2 = '9780544003415';
+const sampleOpenLibraryResponse2 = {
+  publishers: ['Houghton Mifflin'],
+  number_of_pages: 1216,
+  subtitle: 'continuing the story of the hobbit',
+  description:
+    "The 50th anniversary one-volume edition of J.R.R. Tolkien's epic",
+  local_id: ['urn:phillips:31867007108702'],
+  full_title: 'The lord of the rings continuing the story of the hobbit',
+  lc_classifications: ['PR6039.O32'],
+  key: '/books/OL26885115M',
+  authors: [{ key: '/authors/OL26320A' }],
+  publish_places: ['Boston, Mass'],
+  subjects: [
+    'Frodo Baggins (Fictitious character)',
+    'Wizards',
+    'Quests (Expeditions)',
+    'Middle Earth (Imaginary place)',
+    'Fiction',
+  ],
+  edition_name: '50th Anniversary ed.',
+  pagination: '1216 p.',
+  classifications: {},
+  source_records: [
+    'marc:marc_openlibraries_phillipsacademy/PANO_FOR_IA_05072019.mrc:45770467:1308',
+    'bwb:9780544003415',
+  ],
+  title: 'The lord of the rings',
+  notes: 'Includes index.',
+  identifiers: {},
+  isbn_13: ['9780544003415'],
+  languages: [{ key: '/languages/eng' }],
+  isbn_10: ['0544003411'],
+  publish_date: '2012',
+  publish_country: 'mau',
+  by_statement: 'J.R.R. Tolkien',
+  oclc_numbers: ['793573297'],
+  works: [{ key: '/works/OL27448W' }],
+  type: { key: '/type/edition' },
+  location: ['gaaagpl'],
+  covers: [14617723],
+  latest_revision: 5,
+  revision: 5,
+  created: { type: '/type/datetime', value: '2019-05-14T02:03:40.352420' },
+  last_modified: {
+    type: '/type/datetime',
+    value: '2024-04-23T13:56:12.694252',
+  },
+};
+
 describe('BookController (e2e)', () => {
   let app: INestApplication;
 
@@ -168,6 +218,65 @@ describe('BookController (e2e)', () => {
         message: 'Book not found',
         statusCode: 404,
       });
+    });
+
+    it('should enrich the data if the isbn field is updated', async () => {
+      const createResponse = await request(app.getHttpServer())
+        .post('/book')
+        .send(payload)
+        .expect(201);
+
+      const bookId = createResponse.body.id;
+
+      const updateResponse = await request(app.getHttpServer())
+        .patch(`/book/${bookId}`)
+        .send({ ...payload, isbn: sampleIsbn2 })
+        .expect(200);
+
+      expect(updateResponse.body.extra).toEqual(sampleOpenLibraryResponse2);
+
+      // Verify the cache is updated
+      const cacheResponse = await request(app.getHttpServer())
+        .get(`/book/${bookId}`)
+        .expect(200);
+
+      expect(cacheResponse.body.extra).toEqual(sampleOpenLibraryResponse2);
+    });
+
+    it('should not enrich the data if the isbn field is not updated', async () => {
+      const createResponse = await request(app.getHttpServer())
+        .post('/book')
+        .send(payload)
+        .expect(201);
+
+      console.debug('createResponse', createResponse.body);
+
+      const bookId = createResponse.body.id;
+
+      const updateResponse = await request(app.getHttpServer())
+        .patch(`/book/${bookId}`)
+        .send({ ...payload, title: 'Updated Title' })
+        .expect(200);
+
+      console.debug('updateResponse', updateResponse.body);
+
+      expect(updateResponse.body.extra).toEqual(sampleOpenLibraryResponse);
+    });
+
+    it('should set extra to null if the provided ISBN is not valid', async () => {
+      const createResponse = await request(app.getHttpServer())
+        .post('/book')
+        .send(payload)
+        .expect(201);
+
+      const bookId = createResponse.body.id;
+
+      const updateResponse = await request(app.getHttpServer())
+        .patch(`/book/${bookId}`)
+        .send({ ...payload, isbn: 'invalid' })
+        .expect(200);
+
+      expect(updateResponse.body.extra).toEqual(null);
     });
   });
 

@@ -1,5 +1,5 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { IBook } from './book.interface';
+import { IBook, OpenLibraryResponse } from './book.interface';
 
 @Entity()
 export class Book implements IBook {
@@ -20,4 +20,7 @@ export class Book implements IBook {
 
   @Column()
   isbn: string;
+
+  @Column({ type: 'jsonb', nullable: true })
+  extra?: OpenLibraryResponse | null;
 }

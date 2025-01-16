@@ -48,23 +48,34 @@ export class BookService {
     return book;
   }
 
-  async updateBook(id: number, bookData: Partial<IBook>): Promise<IBook> {
-    const book = await this.bookRepository.findOneBy({ id });
+  async updateBook(id: number, payload: Partial<IBook>): Promise<IBook> {
+    const existingRecord = await this.bookRepository.findOneBy({ id });
 
-    if (!book) {
+    if (!existingRecord) {
       throw new NotFoundException('Book not found');
     }
 
-    // Merge the updates with existing book
-    const updatedBook = await this.bookRepository.save({
-      ...book,
-      ...bookData,
-    });
+    let updatedBook: IBook;
+    // If the isbn field is updated, enrich the book data
+    if (payload.isbn && payload.isbn !== existingRecord.isbn) {
+      updatedBook = await this.bookEnrichmentService.enrichBookData({
+        ...existingRecord,
+        ...payload,
+      });
+    } else {
+      updatedBook = {
+        ...existingRecord,
+        ...payload,
+      };
+    }
+
+    // Save to database
+    const savedBook = await this.bookRepository.save(updatedBook);
 
     // Update cache
-    await this.cacheService.set(`book:${id}`, updatedBook, 3600);
+    await this.cacheService.set(`book:${id}`, savedBook, 3600);
 
-    return updatedBook;
+    return savedBook;
   }
 
   async deleteBook(id: number): Promise<boolean> {
