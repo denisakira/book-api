@@ -1,5 +1,5 @@
 import { CacheModule, CacheStore } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { CacheService } from './cache.service';
 import { redisStore } from 'cache-manager-redis-store';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -18,12 +18,14 @@ const cacheConfigFactory = async (configService: ConfigService) => {
   };
 };
 
+@Global()
 @Module({
   imports: [
     CacheModule.registerAsync({
       imports: [ConfigModule],
       useFactory: cacheConfigFactory,
       inject: [ConfigService],
+      isGlobal: true,
     }),
   ],
   providers: [CacheService],

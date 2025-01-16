@@ -12,7 +12,7 @@ describe('BookController (e2e)', () => {
     author: 'Test Author',
     description: 'Test Description',
     publishedDate: new Date(),
-    isbn: '1234567890',
+    isbn: '9780140328721',
   };
 
   beforeEach(async () => {
@@ -35,6 +35,15 @@ describe('BookController (e2e)', () => {
       ...payload,
       publishedDate: payload.publishedDate.toISOString(),
     });
+  });
+
+  it('should create a book with null extra data if the isbn is invalid', async () => {
+    const response = await request(app.getHttpServer())
+      .post('/book')
+      .send({ ...payload, isbn: 'invalid' })
+      .expect(201);
+
+    expect(response.body.extra).toBeNull();
   });
 
   it('/book/:id (GET)', async () => {

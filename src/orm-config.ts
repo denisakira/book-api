@@ -7,14 +7,7 @@ config();
 
 const configService = new ConfigService();
 
-export const dataSourceOptionsCallback = () => {
-  if (process.env.NODE_ENV === 'test') {
-    return e2eDataSourceOptions;
-  }
-  return dataSourceOptions;
-};
-
-export const dataSourceOptions: DataSourceOptions = {
+const dataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   host: configService.get('DB_HOST'),
   port: configService.get('DB_PORT'),
@@ -27,10 +20,16 @@ export const dataSourceOptions: DataSourceOptions = {
   logging: true,
 };
 
-export const e2eDataSourceOptions: DataSourceOptions = {
+const e2eDataSourceOptions: DataSourceOptions = {
   ...dataSourceOptions,
-  host: 'localhost',
   entities: [join(__dirname, '..', 'src', '**', '*.entity.{ts,js}')],
+};
+
+export const dataSourceOptionsCallback = () => {
+  if (process.env.NODE_ENV === 'test') {
+    return e2eDataSourceOptions;
+  }
+  return dataSourceOptions;
 };
 
 export const dataSource = new DataSource(dataSourceOptions);

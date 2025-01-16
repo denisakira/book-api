@@ -6,14 +6,9 @@ import { BookService } from './book.service';
 export class BookController {
   constructor(private readonly bookService: BookService) {}
 
-  @Get()
-  getBooks(): Promise<IBook[]> {
-    return this.bookService.getBooks();
-  }
-
   @Get(':id')
   getBookById(@Param('id') id: number): Promise<IBook> {
-    return this.bookService.getBookById(id);
+    return this.bookService.getBook(id);
   }
 
   @Post()

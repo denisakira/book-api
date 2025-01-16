@@ -8,28 +8,23 @@ services:
       - /usr/src/app/node_modules
     env_file: .env
     depends_on:
-      - db
+      - database
     networks:
-      - db
+      - database
 
-  db:
-    container_name: postgres-db
+  database:
+    container_name: postgres-database
     image: postgres
     env_file: .env
     volumes:
-      - db:/data/postgres
+      - database:/data/postgres
     ports:
       - "5600:5432"
     expose:
       - 5600
     networks:
-      - db
+      - database
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:alpine
@@ -37,11 +32,11 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - db
+      - database
 
 networks:
-  db:
+  database:
     driver: bridge
 
 volumes:
-  db:
+  database:
