@@ -17,6 +17,12 @@ The book data from OpenLibrary is added to records in the moment of their creati
 
 Copy `.env.example` to `.env` and fill in the values. The docker compose file will create the database and redis instances.
 
+Install the dependencies:
+
+```bash
+npm install
+```
+
 To start the app, run:
 
 ```bash
