@@ -15,10 +15,18 @@ The book data from OpenLibrary is added to records in the moment of their creati
 
 ## Running the app
 
-Copy `.env.example` to `.env` and fill in the values. Then run:
+Copy `.env.example` to `.env` and fill in the values. The docker compose file will create the database and redis instances.
+
+To start the app, run:
 
 ```bash
 docker compose up
+```
+
+To run the migrations, run:
+
+```bash
+docker compose exec -it app npm run typeorm:migration:run
 ```
 
 The application will be available at `http://localhost:3000`.
